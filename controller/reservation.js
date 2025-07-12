@@ -1,26 +1,24 @@
-import ErrorHandler from "../middlewares/error.js";
-import { Reservation } from "../models/reservation.js";
-
-const send_reservation = async (req, res, next) => {
-  const { firstName, lastName, email, date, time, phone } = req.body;
-  if (!firstName || !lastName || !email || !date || !time || !phone) {
-    return next(new ErrorHandler("Please Fill Full Reservation Form!", 400));
-  }
-
+// controller/reservation.js
+const send_reservation = async (req, res) => {
   try {
-    await Reservation.create({ firstName, lastName, email, date, time, phone });
-    res.status(201).json({
+    const { firstName, lastName, email, phone, date, time } = req.body;
+
+    // Basic validation (you can expand this)
+    if (!firstName || !lastName || !email || !phone || !date || !time) {
+      return res.status(400).json({ success: false, message: "Please fill all fields." });
+    }
+
+    // Optional: save to DB (if connected to MongoDB)
+
+    return res.status(200).json({
       success: true,
       message: "Reservation Sent Successfully!",
     });
   } catch (error) {
-    
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
-      return next(new ErrorHandler(validationErrors.join(', '), 400));
-    }
-
-    return next(error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong!",
+    });
   }
 };
 
